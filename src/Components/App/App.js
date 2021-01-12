@@ -39,6 +39,33 @@ class App extends React.Component {
         }
       ]
     }
+
+    this.addTrack = this.addTrack.bind(this);
+    this.removeTrack = this.removeTrack.bind(this);
+    this.updatePlaylistName = this.updatePlaylistName.bind(this);
+  }
+
+  addTrack(track) {
+    if (this.state.playlistTracks.find((savedTrack) => savedTrack.id === track.id)) {
+      return;
+    }
+    this.setState({
+      playlistTracks: [...this.state.playlistTracks, track]
+    });
+  }
+
+  removeTrack(track) {
+    if (this.state.playlistTracks.find((savedTrack) => savedTrack.id === track.id)) {
+      this.setState({
+        playlistTracks: this.state.playlistTracks.filter((savedTrack) => savedTrack.id !== track.id)
+      });
+    }
+  }
+
+  updatePlaylistName(name) {
+    this.setState({
+      playlistName: name
+    });
   }
 
   render() {
@@ -47,10 +74,13 @@ class App extends React.Component {
         <h1>Shu<span className="highlight">ffl</span>ing</h1>
         <div className="App">
           <SearchBar />
-          <SearchResults searchResults={this.state.searchResults} />
+          <SearchResults searchResults={this.state.searchResults}
+                         onAdd={this.addTrack} />
           <div className="App-playlist">
             <Playlist playlistName={this.state.playlistName} 
-                      playlistTracks={this.state.playlistTracks} />
+                      playlistTracks={this.state.playlistTracks} 
+                      onRemove={this.removeTrack} 
+                      onNameChange={this.updatePlaylistName} />
           </div>
         </div>
       </div>
