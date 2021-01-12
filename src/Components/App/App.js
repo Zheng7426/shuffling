@@ -1,7 +1,7 @@
 import './App.css';
 import SearchBar from '../SearchBar/SearchBar';
 import SearchResults from '../SearchResults/SearchResults';
-
+import Playlist from '../Playlist/Playlist';
 
 function App() {
   return (
@@ -11,7 +11,7 @@ function App() {
           <SearchBar />
           <SearchResults />
           <div className="App-playlist">
-
+            <Playlist />
           </div>
         </div>
     </div>
