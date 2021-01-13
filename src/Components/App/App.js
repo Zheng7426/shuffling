@@ -29,13 +29,15 @@ class App extends React.Component {
           name: 'Merry Christmas Mr.Lawrrence',
           artist: 'Ryuichi Sakamoto',
           album: 'Songs',
-          id: 3
+          id: 3,
+          uri: 2021
         },
         {
           name: 'Cherry Blossom Time',
           artist: 'Kotaro Ishio',
           album: 'Songs',
-          id: 4
+          id: 4,
+          uri: 2020
         }
       ]
     }
@@ -43,6 +45,8 @@ class App extends React.Component {
     this.addTrack = this.addTrack.bind(this);
     this.removeTrack = this.removeTrack.bind(this);
     this.updatePlaylistName = this.updatePlaylistName.bind(this);
+    this.savePlaylist = this.savePlaylist.bind(this);
+    this.search = this.search.bind(this);
   }
 
   addTrack(track) {
@@ -68,19 +72,28 @@ class App extends React.Component {
     });
   }
 
+  savePlaylist() {
+    const trackURIs = this.state.playlistTracks.map((track) => track.id);
+  }
+
+  search(term) {
+    console.log(`You wanted to search ${term}.`);
+  }
+
   render() {
     return (
       <div>
         <h1>Shu<span className="highlight">ffl</span>ing</h1>
         <div className="App">
-          <SearchBar />
-          <SearchResults searchResults={this.state.searchResults}
-                         onAdd={this.addTrack} />
+          <SearchBar onSearch={this.search} />
           <div className="App-playlist">
+            <SearchResults searchResults={this.state.searchResults}
+                         onAdd={this.addTrack} />
             <Playlist playlistName={this.state.playlistName} 
                       playlistTracks={this.state.playlistTracks} 
                       onRemove={this.removeTrack} 
-                      onNameChange={this.updatePlaylistName} />
+                      onNameChange={this.updatePlaylistName} 
+                      onSave={this.savePlaylist} />
           </div>
         </div>
       </div>
