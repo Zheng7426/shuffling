@@ -4,8 +4,8 @@ import { clientId, redirectUri } from './secrets';
 const searchEndpoint = 'https://api.spotify.com/v1/search'
 const authEndpoint = 'https://accounts.spotify.com/authorize';
 const profileEndpoint = 'https://api.spotify.com/v1/me'; 
-const playlistCreateEndpoint = 'https://api.spotify.com/v1/users/';
-const playlistAddTrackEndpoint = 'https://api.spotify.com/v1/playlists/';
+const playlistEndpoint = 'https://api.spotify.com/v1/users/';
+//const playlistAddTrackEndpoint = 'https://api.spotify.com/v1/playlists/';
 const responseType = 'token';
 let accessToken;
 
@@ -56,66 +56,45 @@ const Spotify = {
         }
     },
 
-    async getUserInfo() {
-        if(accessToken === undefined) {
-            this.getAccessToken();
-        }
-        const headers = {
-            Authorization: `Bearer ${accessToken}`
-        };
-        try {
-            const response = await fetch(profileEndpoint, {
-                headers: headers
-            });
-            if (response.ok) {
-                const jsonResponse = await response.json();
-                return {
-                    userId: jsonResponse.id,
-                    userName: jsonResponse.display_name
-                };
-            }
-            throw new Error('UserInfo Request Failed!');
-        } catch(error) {
-            console.log(error);
-        }
-    },
-
     async savePlaylist(playlistName, trackURIs) {
-        if(accessToken === undefined) {
-            this.getAccessToken();
-        }
         if (!playlistName || !trackURIs.length) {
             return;
         }
         const accessToken = Spotify.getAccessToken();
-        let userId = await this.getUserInfo().userId;
-        let playlistId;
+        const getHeaders = {
+            Authorization: `Bearer ${accessToken}`
+        };
+        const postHeaders = {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`
+        }
+        let userId;
+        
         try {
-            const response = await fetch(`${playlistCreateEndpoint}${userId}/playlists`, {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${accessToken}`
-                },
-                body: JSON.stringify({name: playlistName})
+            const userResponse = await fetch(profileEndpoint, {
+                headers: getHeaders
             });
-            if (response.ok) {
-                const jsonResponse = await response.json();
-                playlistId = jsonResponse.id;
-                await fetch(`${playlistAddTrackEndpoint}${playlistId}/tracks`, {
+            if (userResponse.ok) {
+                const jsonUserResponse = await userResponse.json();
+                userId = jsonUserResponse.id;
+                const playlistResponse = await fetch(`${playlistEndpoint}${userId}/playlists`, {
+                    headers: postHeaders,
                     method: 'POST',
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${accessToken}`
-                    },
-                    body: JSON.stringify({uris: trackURIs})
+                    body: JSON.stringify({name: playlistName})
                 });
+                if (playlistResponse.ok) {
+                    const jsonPlaylistResponse = await playlistResponse.json();
+                    const playlistId = jsonPlaylistResponse.id;
+                    const addTrackResponse = await fetch(`${playlistEndpoint}${userId}/playlists/${playlistId}/tracks`, {
+                        headers: postHeaders,
+                        method: 'POST',
+                        body: JSON.stringify({ uris: trackURIs})
+                    });
+                }
             }
         } catch(error) {
             console.log(error);
         }
-
-
     }
 };
 
