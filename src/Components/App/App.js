@@ -3,25 +3,14 @@ import './App.css';
 import SearchBar from '../SearchBar/SearchBar';
 import SearchResults from '../SearchResults/SearchResults';
 import Playlist from '../Playlist/Playlist';
+import Spotify from '../../util/Spotify';
+
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      searchResults: [
-        {
-          name: 'homesick',
-          artist: 'kings of convenience',
-          album: 'riot in an empty street',
-          id: 1
-        },
-        {
-          name: 'When we were young',
-          artist: 'adele',
-          album: '25',
-          id: 2
-        }
-      ],
+      searchResults: [],
 
       playlistName: 'Sum',
       playlistTracks: [
@@ -77,8 +66,16 @@ class App extends React.Component {
   }
 
   search(term) {
-    console.log(`You wanted to search ${term}.`);
+    //console.log(`You wanted to search ${term}.`);
+    Spotify.search(term).then(tracks => {
+      this.setState({
+        searchResults: tracks
+      });
+    });
+    // console.log(Spotify.search(term));
   }
+
+
 
   render() {
     return (
@@ -98,6 +95,10 @@ class App extends React.Component {
         </div>
       </div>
     );
+  }
+
+  componentDidMount() {
+    Spotify.getAccessToken();
   }
 }
 
